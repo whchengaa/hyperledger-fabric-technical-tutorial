@@ -1,0 +1,93 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+networks:
+  fabric_net:
+    external: true
+
+services:
+  peer-base:
+    image: hyperledger/fabric-peer:x86_64-1.1.0
+    restart: always
+    environment:
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_net
+      - CORE_LOGGING_LEVEL=DEBUG
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      # The following setting skips the gossip handshake since we are
+      # are not doing mutual TLS
+      - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/crypto/peer/msp
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/crypto/peer/tls/server.key
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/crypto/peer/tls/server.crt
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/crypto/peer/tls/ca.crt
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    volumes:
+        - /var/run/:/host/var/run/
+    networks:
+      - fabric_net
+
+  zookeeper:
+    image: hyperledger/fabric-zookeeper:x86_64-1.0.3
+    restart: always
+    ports:
+      - '2181'
+      - '2888'
+      - '3888'
+    networks:
+      - fabric_net
+
+  kafka:
+    image: hyperledger/fabric-kafka:x86_64-1.0.3
+    restart: always
+    environment:
+      # ========================================================================
+      #     Reference: https://kafka.apache.org/documentation/#configuration
+      # ========================================================================
+      #
+      # socket.request.max.bytes
+      # The maximum number of bytes in a socket request. ATTN: If you set this
+      # env var, make sure to update `brokerConfig.Producer.MaxMessageBytes` in
+      # `newBrokerConfig()` in `fabric/orderer/kafka/config.go` accordingly.
+      #- KAFKA_SOCKET_REQUEST_MAX_BYTES=104857600 # 100 * 1024 * 1024 B
+      #
+      # message.max.bytes
+      # The maximum size of envelope that the broker can receive.
+      - KAFKA_MESSAGE_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
+      #
+      # replica.fetch.max.bytes
+      # The number of bytes of messages to attempt to fetch for each channel.
+      # This is not an absolute maximum, if the fetched envelope is larger than
+      # this value, the envelope will still be returned to ensure that progress
+      # can be made. The maximum message size accepted by the broker is defined
+      # via message.max.bytes above.
+      - KAFKA_REPLICA_FETCH_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
+      #
+      # unclean.leader.election.enable
+      # Data consistency is key in a blockchain environment. We cannot have a
+      # leader chosen outside of the in-sync replica set, or we run the risk of
+      # overwriting the offsets that the previous leader produced, and --as a
+      # result-- rewriting the blockchain that the orderers produce.
+      - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
+      #
+      # log.retention.ms
+      # Until the ordering service in Fabric adds support for pruning of the
+      # Kafka logs, time-based retention should be disabled so as to prevent
+      # segments from expiring. (Size-based retention -- see
+      # log.retention.bytes -- is disabled by default so there is no need to set
+      # it explicitly.)
+      - KAFKA_LOG_RETENTION_MS=-1
+    ports:
+      - '9092'
+    networks:
+      - fabric_net
