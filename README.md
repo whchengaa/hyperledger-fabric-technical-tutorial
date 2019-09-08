@@ -13,3 +13,5 @@
 *	Remarks on high-availability of the Fabric network
 
 Please download .docx file for more details.
+
+You can also check out this article https://medium.com/@cloudycalvin/deploy-a-cross-machine-kafka-based-multi-orderer-hyperledger-fabric-network-with-docker-swarm-8ccdd76bae5
