@@ -8,7 +8,7 @@
 *	Deploy CouchDB for more efficient blockchain data query
 *	Deploy MongoDB for storage of client credentials
 *	Deploy Hyperledger Explorer
-*	Deploy a cross-machine kafka-based multi-orderer network with Docker Swarm
+*	Deploy a cross-machine kafka-based multi-orderer network with Docker Swarm (multiple hosts / multiple machines)
 *	Deploy a cross-machine kafka-based multi-orderer network with hosts file
 *	Remarks on high-availability of the Fabric network
 
