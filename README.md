@@ -9,7 +9,7 @@
 *	Deploy MongoDB for storage of client credentials
 *	Deploy Hyperledger Explorer
 *	Deploy a cross-machine kafka-based multi-orderer network with Docker Swarm (multiple hosts / multiple machines)
-*	Deploy a cross-machine kafka-based multi-orderer network with hosts file
+*	Deploy a cross-machine kafka-based multi-orderer network with hosts file (static IP)
 *	Remarks on high-availability of the Fabric network
 
 Please download .docx file for more details.
