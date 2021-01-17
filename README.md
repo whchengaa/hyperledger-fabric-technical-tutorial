@@ -15,3 +15,5 @@
 Please download .docx file for more details.
 
 You can also check out this article https://medium.com/@cloudycalvin/deploy-a-cross-machine-kafka-based-multi-orderer-hyperledger-fabric-network-with-docker-swarm-8ccdd76bae5
+
+Remark: The original source code is forked from https://github.com/hyperledger/fabric-samples/tree/release-1.4
